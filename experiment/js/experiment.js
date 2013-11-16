@@ -39,7 +39,7 @@
 				$.ajax({
 					type: "GET",
 					async: false,
-					url: "http://ui.local/experiment/system.php",
+					url: baseUrl + pathToDataPhp + siteDir,
 					data: serializedData,
 					beforeSend: function(response){alert('Sending');},
 					success: function(response){ alert('success');},
