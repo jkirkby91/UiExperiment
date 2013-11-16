@@ -1,12 +1,11 @@
 /**
-* initExperimentVariables()
-* Sets the page timer variables
+* pageCounter()
+* Creates the page timer in seconds
 */
 
-function initExperimentVariables() {
-	firstDate = new Date();
-	firstMinute = firstDate.getMinutes();
-	firstSeconds = firstDate.getSeconds();
+function pageCounter(){
+     timeSpent = 0;
+     setInterval( "timeSpent++", 1000);
 }
 
 /**
@@ -60,24 +59,8 @@ window.onbeforeunload = function() {
 			 .replace(pathToDataPhp, "");
 	
 	/*
-	* since this event is fired on browser close we can assume 
-	* its the end of the vistiors interaction with the test
-	* so grab the end time
-	*/
-		 lastDate = new Date();
-		 lastMinute = lastDate.getMinutes();
-		 lastSeconds = lastDate.getSeconds();	
-	/*
-	* minus initial page time by final page time to get timeSpent
-	*/ 
-		 pageMinute = (lastMinute - firstMinute);
-		 pageSeconds = (lastSeconds - firstSeconds);
-		 timeSpent = pageMinute + pageSeconds;
-	
-	/*
 	* set timeSpent to hidden form time value
-	*/	 
-		 $('#time').val(timeSpent);	
+	*/		 $('#time').val(timeSpent);	
 	/* 
 	* serialize the form data into a string that can be used for ajax
 	*/	 
@@ -99,6 +82,7 @@ window.onbeforeunload = function() {
 				complete: function(response){alert('finished');},
 			})
 	}	
+	
 	/* 
 	* trying to get all the data from the ui experiment to be sent onbeforeunload was hard
 	* this binds a click event to the #submitButton that has the fuction submitExperimentData() attached to the click event
@@ -106,26 +90,36 @@ window.onbeforeunload = function() {
 	* So when the visitor closes the page the window.onbeforeunload = function() is run which is firing $("#submitButton").bind
 	* This being attached to a click event is clicking the button and firing the submitExperimentData() fuction which is sending the data
 	*/
+	
 	$("#submitButton").bind('click',submitExperimentData());	
+	
 	/*
 	* i found that using a return here toforce a dialog box up kept the dom and page active allowing
 	* time for the ajax request to be comple and vie console.log() data for debugging the window.onbeforeunload = function() 
 	*/
+	
   return "thanks for participating";
  }	
 $(document).ready(function(){
+
 /*
-* bring varibles into the dom
+* bring counter into the dom
 */
-  initExperimentVariables()
+
+  pageCounter();
+
 /*
 * bring the click counter into the dom
 */  
+
   clickCounter();
+
 /*
 * bring the form into the dom
 */  
+
   buildExperimentHiddenForm();
+  
 })
 	 
 
