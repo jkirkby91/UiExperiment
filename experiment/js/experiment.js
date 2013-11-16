@@ -18,7 +18,6 @@ function initExperimentVariables() {
 function buildExperimentHiddenForm() {
   $('body').append("<form id='experimentForm'></form>");
   $('#experimentForm').css("display", "none");
-  /* $('#experimentForm').attr("action", "experiment/system.php"); */
   $('#experimentForm').append("<input type='text' name='clicks' id='clicks' value='' /><br>");
   $('#experimentForm').append("<input type='text' name='time' id='time' value='' /><br>");
   $('#experimentForm').append("<input type='button' id='submitButton'>");
