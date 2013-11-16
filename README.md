@@ -10,7 +10,7 @@ i.e how many clicks and long does it take a user to complete a certain number of
     comparing the data across different websites variants could tell you which variant is easier for a user to complete
 
 
-initExperimentVariables()
+pageCounter()
 Sets the page timer variables
 
 buildExperimentHiddenForm()
