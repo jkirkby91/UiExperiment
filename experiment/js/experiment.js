@@ -51,7 +51,7 @@ window.onbeforeunload = function() {
  	function submitExperimentData() {
 	
 	/*
-	* Build URI for ajax request tomake sure its in a unified format
+	* Build URI for ajax request to make sure its in a unified format
 	*/	
 		var  baseUrl = "http://ui.local"
 			 pathToDataPhp = "/experiment/system.php"
@@ -100,7 +100,6 @@ window.onbeforeunload = function() {
 			})
 	}	
 	/* 
-	* JEEZ these next two lines literally cost me a whole saturday
 	* trying to get all the data from the ui experiment to be sent onbeforeunload was hard
 	* this binds a click event to the #submitButton that has the fuction submitExperimentData() attached to the click event
 	* remeber this is all being ran in window.onbeforeunload = function()
