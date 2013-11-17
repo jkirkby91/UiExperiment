@@ -29,7 +29,6 @@ function buildExperimentHiddenForm() {
 */
 
 function clickCounter() {
-	
 	count = 0;
 
 	$('a').click(function () {
@@ -41,7 +40,6 @@ function clickCounter() {
 /* 
 * Create event lister for when dom is being closed
 */
-
 window.onbeforeunload = function() {
  /*
  * submitExperimentData()
@@ -52,7 +50,7 @@ window.onbeforeunload = function() {
 	/*
 	* Build URI for ajax request to make sure its in a unified format
 	*/	
-		var  baseUrl = "http://ui.local"
+		var  baseUrl = "http://ui.local" //THIS NEEDS TO BE IMPROVED
 			 pathToDataPhp = "/experiment/system.php"
 			 siteDir = window.location.href.toString()
 			 .replace(baseUrl, "")
@@ -94,7 +92,7 @@ window.onbeforeunload = function() {
 	$("#submitButton").bind('click',submitExperimentData());	
 	
 	/*
-	* i found that using a return here toforce a dialog box up kept the dom and page active allowing
+	* i found that using a return here to force a dialog box up kept the dom and page active allowing
 	* time for the ajax request to be comple and vie console.log() data for debugging the window.onbeforeunload = function() 
 	*/
 	
