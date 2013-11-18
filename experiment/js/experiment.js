@@ -1,3 +1,34 @@
+/*
+* ThanksTo //quirksmode.org/js/cookies.html
+* for these simple cookie functions
+*/
+
+function createCookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+
+function eraseCookie(name) {
+	createCookie(name,"",-1);
+}
+
+
 /**
 * pageCounter()
 * Creates the page timer in seconds
@@ -82,17 +113,17 @@ function windowUnload() {
 			* the data sent across comes from the serializedData var declared erlier
 			* Some status codes so we know whats going on
 			*/	 			 
-					$.ajax({
-						type: "GET",
-						async: false,
-						url: experimentSystem,
-						data: serializedData,
-						beforeSend: function(response){alert('Sending');},
-						success: function(response){ alert('success');},
-						error: function(response){alert('failed');},
-						complete: function(response){alert('finished');},
-					})
-			}	
+$.ajax({
+                                                type: "GET",
+                                                async: false,
+                                                url: experimentSystem,
+                                                data: serializedData,
+                                                beforeSend: function(response){alert('Sending');},
+                                                success: function(response){ alert('success');},
+                                                error: function(response){alert('failed');},
+                                                complete: function(response){alert('finished');},
+                                        })
+                        }        
 			
 			/* 
 			* trying to get all the data from the ui experiment to be sent onbeforeunload was hard
@@ -171,6 +202,8 @@ function experimentEnviroment() {
 * Adds event listeners to all clicks
 * checks the href value, if its not listed in the experiment pages the windowUnload function is bind() to the click even
 * This allows you to add urls to the expeirmentPages array to  allow the experiment carry on across pages
+* Thanks to adeneo {answer #4} //stackoverflow.com/questions/20051666/check-if-value-is-in-array-always-returning-true#
+* for helping on the syntax of the inArray() on the experimentPages array
 */
 
 function experiment() {
@@ -179,30 +212,21 @@ function experiment() {
   
   $('a').click(function(){
   
+  	var reqestedPage = $(this).attr("href");
 
-	  	var reqestedPage = $(this).attr("href");
-/*
-  		var myvar = "bsc.html"
-  		
+/* 			var myvar = "bsc.html"  		
   			if( reqestedPage != myvar ) {
-	  			$(this).bind('click',windowUnload());
-	  		}
+	  			$(this).bind('click',windowUnload());}    */
+	  			 
 
-	  		
-		 console.log(experimentPages);
-		 console.log(reqestedPage);
-		 console.log($.inArray(experimentPages, reqestedPage) != -1);
-*/ 
-	    if ($.inArray(experimentPages, reqestedPage) != -1) {
-	    
-	   
+	if ($.inArray(reqestedPage, experimentPages) != -1) {
        	
-       		   		 }else{     		   		 
+	}else{     		   		 
 		$(this).bind('click',windowUnload());
-		   	 /* $(this).on('click', windowUnload); */
-		}	  		
+		 }	  		
   });
 }
+
 
 $(document).ready(function(){
 
