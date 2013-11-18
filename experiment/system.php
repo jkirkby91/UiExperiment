@@ -42,7 +42,7 @@
 		$myFile = "experimentErrorLog.txt";
 		$fh = fopen($myFile, 'a') or die("can't open file");
 		
-		$stringData = "experimentID: '$insert_id' - timeSpent: '$_GET['time']' - clicks: '$_GET['clicks']' \n ";
+		$stringData = "experimentID: '$insert_id' - timeSpent: '".$_GET['time']."' - clicks: '".$_GET['clicks']."' \n ";
 		fwrite($fh, $stringData);
 
 		fclose($fh);

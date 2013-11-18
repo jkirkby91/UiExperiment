@@ -1,36 +1,3 @@
-/*
-* ThanksTo //quirksmode.org/js/cookies.html
-* for these simple cookie functions
-*/
-
-function createCookie(name,value,days) {
-	
-	if (days) {
-		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		var expires = "; expires="+date.toGMTString();
-	}
-	else var expires = "";
-	document.cookie = name+"="+value+expires+"; path=/";
-}
-
-function readCookie(name) {
-	
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
-
-function eraseCookie(name) {
-	
-	createCookie(name,"",-1);
-}
-
 /** cleanExperimentEnviroment()
 * Simply sets all values to 0 cleans all cookies
 * good for dev work and clearing experimentEnviroment after test is complete
@@ -38,11 +5,11 @@ function eraseCookie(name) {
 * would be perfect but haven't got it right yet
 */
 function cleanExperimentEnviroment() {
-
-	eraseCookie('clickDataCookie');
-	eraseCookie('timeSpentDataCookie');
-	eraseCookie('experimentStatus');
-
+	
+	$.cookie("clickCookie", 0);
+	$.cookie("timeSpentCookie", 0);
+	$.cookie("experimentStatus", "");
+	
 	$clicks = 0;
     $timeSpent = 0;
     $experimentSystem = 0;
@@ -62,9 +29,8 @@ function cleanExperimentEnviroment() {
 */
 function pageCounter(){
    
-     $timeSpent = 0;
-    
-     setInterval( "timeSpent++", 1000);
+     $timeSpent = 0;    
+     setInterval( "$timeSpent++", 1000);
 }
 
 /**
@@ -96,9 +62,9 @@ function clickCounter() {
 	
 	 	window.onbeforeunload = null;
 		
-		$clicks += 1;  
-		
+		$clicks += 1;  		
 		$("#clicks").val($clicks);
+		
 	});
 }
 
@@ -127,9 +93,17 @@ function experimentURI() {
 */
 function setCookieData() {
 
-	  	createCookie('experimentStatus','inProgress',1);
-  		createCookie('clickDataCookie',clicks,1);
-  		createCookie('timeSpentDataCookie',timeSpent,1); 		
+  	   	var existingClicks = parseInt($.cookie("clickCookie"));
+  	   	var existingTimeSpent = $.cookie("timeSpentCookie");		
+		var existingTimeSpent = parseInt(existingTimeSpent);
+				
+		$clicks = $clicks+existingClicks
+		$timeSpent = $timeSpent+existingTimeSpent
+		
+		$.cookie("experimentStatus", "inProgress", { expires: 1 });
+		$.cookie("clickCookie", $clicks, { expires: 1 });
+		$.cookie("timeSpentCookie", $timeSpent, { expires: 1 });
+		alert("debugging");
 }
 
 /*
@@ -165,15 +139,15 @@ function windowUnload() {
 			* Some status codes so we know whats going on
 			*/	 			 
 						$.ajax({
-                                                type: "GET",
-                                                async: false,
-                                                url: $experimentSystem,
-                                                data: serializedData,
-                                                beforeSend: function(response){alert('Sending');},
-                                                success: function(response){ alert('success');},
-                                                error: function(response){alert('failed');},
-                                                complete: function(response){alert('finished');},
-                                        })
+	                                type: "GET",
+	                                async: false,
+	                                url: $experimentSystem,
+	                                data: serializedData,
+	                                beforeSend: function(response){alert('Sending');},
+	                                success: function(response){ alert('success');},
+	                                error: function(response){alert('failed');},
+	                                complete: function(response){alert('finished');},
+	                        })
                         }        
 			
 			/* 
@@ -230,12 +204,19 @@ function windowUnload() {
 })(jQuery);
 
 /* experimentEnviroment() 
-* bring all the functions for the experiment into one function
+* initalise the experiment enviroment
+* Check to see if there is an experiment in progress
+* if not clean the enviroment preparing it for a new test
+* if experiment is in progress set the $clicks and $timSpent so experiment can continue
 * bring the excluded experiment pages with the custom import_js(); function thanks @Kipras
+* bring the experiment experiment elements into the enviroment
 */
 function experimentEnviroment() {
+
+  $.import_js('experiment/js/experimentPages.js');
+  $.import_js('experiment/js/jquery.cookie.js');
   		
-  var experimentStatus = readCookie('experimentStatus', 'inProgress')
+  var experimentStatus = $.cookie("experimentStatus")
   
   if (experimentStatus == null ){
   		
@@ -243,17 +224,18 @@ function experimentEnviroment() {
   		
   }
   else {
-	   clicks = readCookie('clickDataCookie');
-	   timeSpent = readCookie('timeSpentDataCookie')
-  } 
   
-  $.import_js('experiment/js/experimentPages.js');
+	   $clicks = $.cookie("clickCookie");
+	   $timeSpent = $.cookie("timeSpentDataCookie");
+  } 
 
   pageCounter();
  
   clickCounter();
   
   buildExperimentHiddenForm();
+ 
+  //enviroment built
   
 }
 
@@ -273,26 +255,23 @@ function experiment() {
   
   $('a').click(function(){
   
-  	 reqestedPage = $(this).attr("href");
-
-/* 			var myvar = "bsc.html"  		
-  			if( reqestedPage != myvar ) {
-	  			$(this).bind('click',windowUnload());}    */
+  	reqestedPage = $(this).attr("href");
 	  			 
-
 	if ($.inArray(reqestedPage, experimentPages) != -1) {
+ 
        	setCookieData();
-	}else{     		   		 
-		$(this).bind('click',windowUnload());
-		 }	  		
+	}else{    
+		$(this).bind('click',windowUnload());		
+	}	  		
   });
+  
+ 
 }
 
 
 $(document).ready(function(){
 
  experiment();
-
 })
 	 
 
