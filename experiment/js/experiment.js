@@ -1,8 +1,40 @@
+/* javascript file importer helper function
+* I wanted to add an external.js file for pages to exclude from the windowUnload(); function
+* so people don't have to go changing the main experiment.js file
+* Thanks to stackoverflow http: //stackoverflow.com/questions/950087/how-to-include-a-javascript-file-in-another-javascript-file
+* answer #47 by member - Kipras
+*/
+(function($)
+{
+    /*
+     * $.import_js() helper (for JavaScript importing within JavaScript code).
+     */
+    var import_js_imported = [];
+
+    $.extend(true,
+    {
+        import_js : function(script)
+        {
+            var found = false;
+            for (var i = 0; i < import_js_imported.length; i++)
+                if (import_js_imported[i] == script) {
+                    found = true;
+                    break;
+                }
+
+            if (found == false) {
+                $("head").append('<script type="text/javascript" src="' + script + '"></script>');
+                import_js_imported.push(script);
+            }
+        }
+    });
+
+})(jQuery);
+
 /**
 * pageCounter()
 * Creates the page timer in seconds
 */
-
 function pageCounter(){
      timeSpent = 0;
      setInterval( "timeSpent++", 1000);
@@ -13,7 +45,6 @@ function pageCounter(){
 * Builds the hidden form used to submit test data to the database
 * then appends it to the body
 */
-
 function buildExperimentHiddenForm() {
   $('body').append("<form id='experimentForm'></form>");
   $('#experimentForm').css("display", "none");
@@ -27,7 +58,6 @@ function buildExperimentHiddenForm() {
 * adds an event listner toall a tags
 * increments var count every click
 */
-
 function clickCounter() {
 	count = 0;
 
@@ -37,86 +67,130 @@ function clickCounter() {
 	});
 }
 
-/* 
-* Create event lister for when dom is being closed
+/*
+* Get experiment URL 
 */
-window.onbeforeunload = function() {
- /*
- * submitExperimentData()
- * method of submitting the experiment data to the database
- */
- 	function submitExperimentData() {
-	
-	/*
-	* Build URI for ajax request to make sure its in a unified format
-	*/	
-		var  baseUrl = "http://ui.local" //THIS NEEDS TO BE IMPROVED
-			 pathToDataPhp = "/experiment/system.php"
-			 siteDir = window.location.href.toString()
-			 .replace(baseUrl, "")
-			 .replace(pathToDataPhp, "");
-	
-	/*
-	* set timeSpent to hidden form time value
-	*/		 $('#time').val(timeSpent);	
-	/* 
-	* serialize the form data into a string that can be used for ajax
-	*/	 
-		 var serializedData = $("#experimentForm").serialize();	
-	/*
-	* Create the ajax request using $_GET
-	* disable async which can cause issues stopping ajax request being sent out onbeforeunload
-	* the data sent across comes from the serializedData var declared erlier
-	* Some status codes so we know whats going on
-	*/	 			 
-			$.ajax({
-				type: "GET",
-				async: false,
-				url: baseUrl + pathToDataPhp + siteDir,
-				data: serializedData,
-				beforeSend: function(response){alert('Sending');},
-				success: function(response){ alert('success');},
-				error: function(response){alert('failed');},
-				complete: function(response){alert('finished');},
-			})
-	}	
-	
-	/* 
-	* trying to get all the data from the ui experiment to be sent onbeforeunload was hard
-	* this binds a click event to the #submitButton that has the fuction submitExperimentData() attached to the click event
-	* remeber this is all being ran in window.onbeforeunload = function()
-	* So when the visitor closes the page the window.onbeforeunload = function() is run which is firing $("#submitButton").bind
-	* This being attached to a click event is clicking the button and firing the submitExperimentData() fuction which is sending the data
-	*/
-	
-	$("#submitButton").bind('click',submitExperimentData());	
-	
-	/*
-	* i found that using a return here to force a dialog box up kept the dom and page active allowing
-	* time for the ajax request to be comple and vie console.log() data for debugging the window.onbeforeunload = function() 
-	*/
-	
-  return "thanks for participating";
- }	
-$(document).ready(function(){
+
+function experimentURI() {
+
+	var pathArray = window.location.href.split( '/' );
+	var protocol = pathArray[0];
+	var host = pathArray[2];
+	var siteUrl = protocol + '//' + host;
+	var pathToDataPhp = "/experiment/system.php"
+
+			 
+	experimentSystem = siteUrl + pathToDataPhp
+}
 
 /*
-* bring counter into the dom
+* windowUnload();
+* encapuslating the window.onbeforeunload() function means it doesnt add the listener on dom ready
+* so you can use the function in if statments to use the experiment across multiple pages
+*/ 
+
+function windowUnload() {
+	/* 
+		* Create event lister for when dom is being closed
+		*/
+
+		window.onbeforeunload = function() {
+		 /*
+		 * submitExperimentData()
+		 * method of submitting the experiment data to the database
+		 */
+		 	function submitExperimentData() {
+		 				
+			 		 experimentURI();
+			/*
+			* set timeSpent to hidden form time value
+			*/		 $('#time').val(timeSpent);	
+			/* 
+			* serialize the form data into a string that can be used for ajax
+			*/	 
+					 var serializedData = $("#experimentForm").serialize();	
+			/*
+			* Create the ajax request using $_GET
+			* disable async which can cause issues stopping ajax request being sent out onbeforeunload
+			* the data sent across comes from the serializedData var declared erlier
+			* Some status codes so we know whats going on
+			*/	 			 
+					$.ajax({
+						type: "GET",
+						async: false,
+						url: experimentSystem,
+						data: serializedData,
+						beforeSend: function(response){alert('Sending');},
+						success: function(response){ alert('success');},
+						error: function(response){alert('failed');},
+						complete: function(response){alert('finished');},
+					})
+			}	
+			
+			/* 
+			* trying to get all the data from the ui experiment to be sent onbeforeunload was hard
+			* this binds a click event to the #submitButton that has the fuction submitExperimentData() attached to the click event
+			* remeber this is all being ran in window.onbeforeunload = function()
+			* So when the visitor closes the page the window.onbeforeunload = function() is run which is firing $("#submitButton").bind
+			* This being attached to a click event is clicking the button and firing the submitExperimentData() fuction which is sending the data
+			*/
+			
+			$("#submitButton").bind('click',submitExperimentData());	
+			
+			/*
+			* i found that using a return here to force a dialog box up kept the dom and page active allowing
+			* time for the ajax request to be comple and vie console.log() data for debugging the window.onbeforeunload = function() 
+			*/
+			
+		  return "thanks for participating";
+		 }	
+
+}
+
+
+/* experimentEnviroment() 
+* bring all the functions for the experiment into one function
+* bring the excluded experiment pages with the custom import_js(); function thanks @Kipras
 */
+function experimentEnviroment() {
+
+  $.import_js('experiment/js/experimentPages.js');
 
   pageCounter();
-
-/*
-* bring the click counter into the dom
-*/  
-
+ 
   clickCounter();
-
-/*
-* bring the form into the dom
-*/  
-
+  
   buildExperimentHiddenForm();
+  
+}
+
+/* experiment()
+* This is the final experiment function
+* it initialises the experimentEnviroment()
+* Adds event listeners to all clicks
+* checks the href value, if its not listed in the experiment pages the windowUnload function is bind() to the click even
+* This allows you to add urls to the expeirmentPages array to  allow the experiment carry on across pages
+*/
+
+function experiment() {
+
+  experimentEnviroment();
+  
+  $('a').click(function(){
+
+	  	var regestedPage = $(this).attr("href");
+  		var myvar = "bsc.html"
+  		
+  			if( regestedPage != myvar ) {
+	  			$(this).bind('click',windowUnload());
+	  		}
+	  		
+  });
+}
+
+$(document).ready(function(){
+
+ experiment();
   
 })
 	 
