@@ -1,36 +1,3 @@
-/* javascript file importer helper function
-* I wanted to add an external.js file for pages to exclude from the windowUnload(); function
-* so people don't have to go changing the main experiment.js file
-* Thanks to stackoverflow http: //stackoverflow.com/questions/950087/how-to-include-a-javascript-file-in-another-javascript-file
-* answer #47 by member - Kipras
-*/
-(function($)
-{
-    /*
-     * $.import_js() helper (for JavaScript importing within JavaScript code).
-     */
-    var import_js_imported = [];
-
-    $.extend(true,
-    {
-        import_js : function(script)
-        {
-            var found = false;
-            for (var i = 0; i < import_js_imported.length; i++)
-                if (import_js_imported[i] == script) {
-                    found = true;
-                    break;
-                }
-
-            if (found == false) {
-                $("head").append('<script type="text/javascript" src="' + script + '"></script>');
-                import_js_imported.push(script);
-            }
-        }
-    });
-
-})(jQuery);
-
 /**
 * pageCounter()
 * Creates the page timer in seconds
@@ -59,11 +26,11 @@ function buildExperimentHiddenForm() {
 * increments var count every click
 */
 function clickCounter() {
-	count = 0;
+	clicks = 0;
 
 	$('a').click(function () {
-		count += 1;  
-		$("#clicks").val(count);
+		clicks += 1;  
+		$("#clicks").val(clicks);
 	});
 }
 
@@ -147,6 +114,38 @@ function windowUnload() {
 
 }
 
+/* javascript file importer helper function
+* I wanted to add an external.js file for pages to exclude from the windowUnload(); function
+* so people don't have to go changing the main experiment.js file
+* Thanks to stackoverflow http: //stackoverflow.com/questions/950087/how-to-include-a-javascript-file-in-another-javascript-file
+* answer #47 by member - Kipras
+*/
+(function($)
+{
+    /*
+     * $.import_js() helper (for JavaScript importing within JavaScript code).
+     */
+    var import_js_imported = [];
+
+    $.extend(true,
+    {
+        import_js : function(script)
+        {
+            var found = false;
+            for (var i = 0; i < import_js_imported.length; i++)
+                if (import_js_imported[i] == script) {
+                    found = true;
+                    break;
+                }
+
+            if (found == false) {
+                $("head").append('<script type="text/javascript" src="' + script + '"></script>');
+                import_js_imported.push(script);
+            }
+        }
+    });
+
+})(jQuery);
 
 /* experimentEnviroment() 
 * bring all the functions for the experiment into one function
@@ -164,6 +163,12 @@ function experimentEnviroment() {
   
 }
 
+/*
+function passExperimentVariables() {
+	window.location=""+reqestedPage+"?clicks="+clicks+"&timeSpent="+timeSpent+""; 
+}
+*/
+
 /* experiment()
 * This is the final experiment function
 * it initialises the experimentEnviroment()
@@ -177,14 +182,29 @@ function experiment() {
   experimentEnviroment();
   
   $('a').click(function(){
+  
 
-	  	var regestedPage = $(this).attr("href");
+	  	var reqestedPage = $(this).attr("href");
   		var myvar = "bsc.html"
   		
-  			if( regestedPage != myvar ) {
+  			if( reqestedPage != myvar ) {
 	  			$(this).bind('click',windowUnload());
 	  		}
 	  		
+/*
+		 console.log(experimentPages);
+		 console.log(reqestedPage);
+		 console.log($.inArray(experimentPages, reqestedPage) != -1);
+		 
+	    if ($.inArray(experimentPages, reqestedPage) != -1) {
+	    
+	   		 passExperimentVariables();
+       	
+       		   		 }else{     		   		 
+		
+		   	 $(this).bind('click',windowUnload());
+		}	
+*/  		
   });
 }
 
