@@ -163,11 +163,7 @@ function experimentEnviroment() {
   
 }
 
-/*
-function passExperimentVariables() {
-	window.location=""+reqestedPage+"?clicks="+clicks+"&timeSpent="+timeSpent+""; 
-}
-*/
+
 
 /* experiment()
 * This is the final experiment function
@@ -185,26 +181,26 @@ function experiment() {
   
 
 	  	var reqestedPage = $(this).attr("href");
+/*
   		var myvar = "bsc.html"
   		
   			if( reqestedPage != myvar ) {
 	  			$(this).bind('click',windowUnload());
 	  		}
+
 	  		
-/*
 		 console.log(experimentPages);
 		 console.log(reqestedPage);
 		 console.log($.inArray(experimentPages, reqestedPage) != -1);
-		 
+*/ 
 	    if ($.inArray(experimentPages, reqestedPage) != -1) {
 	    
-	   		 passExperimentVariables();
+	   
        	
        		   		 }else{     		   		 
 		
-		   	 $(this).bind('click',windowUnload());
-		}	
-*/  		
+		   	 $(this).on('click', windowUnload);
+		}	  		
   });
 }
 
