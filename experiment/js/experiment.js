@@ -198,8 +198,8 @@ function experiment() {
 	   
        	
        		   		 }else{     		   		 
-		
-		   	 $(this).on('click', windowUnload);
+		$(this).bind('click',windowUnload());
+		   	 /* $(this).on('click', windowUnload); */
 		}	  		
   });
 }
