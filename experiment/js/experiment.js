@@ -194,8 +194,6 @@ function experimentEnviroment() {
   
 }
 
-
-
 /* experiment()
 * This is the final experiment function
 * it initialises the experimentEnviroment()
