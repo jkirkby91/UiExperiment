@@ -4,6 +4,7 @@
 */
 
 function createCookie(name,value,days) {
+	
 	if (days) {
 		var date = new Date();
 		date.setTime(date.getTime()+(days*24*60*60*1000));
@@ -14,6 +15,7 @@ function createCookie(name,value,days) {
 }
 
 function readCookie(name) {
+	
 	var nameEQ = name + "=";
 	var ca = document.cookie.split(';');
 	for(var i=0;i < ca.length;i++) {
@@ -25,16 +27,43 @@ function readCookie(name) {
 }
 
 function eraseCookie(name) {
+	
 	createCookie(name,"",-1);
 }
 
+/** cleanExperimentEnviroment()
+* Simply sets all values to 0 cleans all cookies
+* good for dev work and clearing experimentEnviroment after test is complete
+* i want to try and attach this to the sucess ajax call
+* would be perfect but haven't got it right yet
+*/
+function cleanExperimentEnviroment() {
 
+	eraseCookie('clickDataCookie');
+	eraseCookie('timeSpentDataCookie');
+	eraseCookie('experimentStatus');
+
+	$clicks = 0;
+    $timeSpent = 0;
+    $experimentSystem = 0;
+
+    var pathArray = 0;
+    var protocol = 0;
+    var host = 0;
+    var siteUrl = 0;
+    var pathToDataPhp = 0;
+    var serializedData = 0;
+    var experimentStatus = 0;
+    var reqestedPage = 0;
+}
 /**
 * pageCounter()
 * Creates the page timer in seconds
 */
 function pageCounter(){
-     timeSpent = 0;
+   
+     $timeSpent = 0;
+    
      setInterval( "timeSpent++", 1000);
 }
 
@@ -43,12 +72,15 @@ function pageCounter(){
 * Builds the hidden form used to submit test data to the database
 * then appends it to the body
 */
+
 function buildExperimentHiddenForm() {
+ 
   $('body').append("<form id='experimentForm'></form>");
   $('#experimentForm').css("display", "none");
   $('#experimentForm').append("<input type='text' name='clicks' id='clicks' value='' /><br>");
   $('#experimentForm').append("<input type='text' name='time' id='time' value='' /><br>");
   $('#experimentForm').append("<input type='button' id='submitButton'>");
+
 }
 
 /** 
@@ -57,11 +89,16 @@ function buildExperimentHiddenForm() {
 * increments var count every click
 */
 function clickCounter() {
-	clicks = 0;
+
+	$clicks = 0;
 
 	$('a').click(function () {
-		clicks += 1;  
-		$("#clicks").val(clicks);
+	
+	 	window.onbeforeunload = null;
+		
+		$clicks += 1;  
+		
+		$("#clicks").val($clicks);
 	});
 }
 
@@ -78,7 +115,21 @@ function experimentURI() {
 	var pathToDataPhp = "/experiment/system.php"
 
 			 
-	experimentSystem = siteUrl + pathToDataPhp
+	$experimentSystem = siteUrl + pathToDataPhp
+}
+
+/* setCookieDate()
+* Required when experiment is across multiple plages
+* stores clicks and timeSpent var data in cookie
+* when each page runs experiment() experimentEnviroment() initialises the experiment
+* which checks to see if the experimentStatus cookie is set to inProgree
+* which is generated here
+*/
+function setCookieData() {
+
+	  	createCookie('experimentStatus','inProgress',1);
+  		createCookie('clickDataCookie',clicks,1);
+  		createCookie('timeSpentDataCookie',timeSpent,1); 		
 }
 
 /*
@@ -88,10 +139,10 @@ function experimentURI() {
 */ 
 
 function windowUnload() {
-	/* 
+	    
+	    /* 
 		* Create event lister for when dom is being closed
-		*/
-
+		*/	
 		window.onbeforeunload = function() {
 		 /*
 		 * submitExperimentData()
@@ -102,7 +153,7 @@ function windowUnload() {
 			 		 experimentURI();
 			/*
 			* set timeSpent to hidden form time value
-			*/		 $('#time').val(timeSpent);	
+			*/		 $('#time').val($timeSpent);	
 			/* 
 			* serialize the form data into a string that can be used for ajax
 			*/	 
@@ -113,10 +164,10 @@ function windowUnload() {
 			* the data sent across comes from the serializedData var declared erlier
 			* Some status codes so we know whats going on
 			*/	 			 
-$.ajax({
+						$.ajax({
                                                 type: "GET",
                                                 async: false,
-                                                url: experimentSystem,
+                                                url: $experimentSystem,
                                                 data: serializedData,
                                                 beforeSend: function(response){alert('Sending');},
                                                 success: function(response){ alert('success');},
@@ -183,7 +234,19 @@ $.ajax({
 * bring the excluded experiment pages with the custom import_js(); function thanks @Kipras
 */
 function experimentEnviroment() {
-
+  		
+  var experimentStatus = readCookie('experimentStatus', 'inProgress')
+  
+  if (experimentStatus == null ){
+  		
+  		cleanExperimentEnviroment();
+  		
+  }
+  else {
+	   clicks = readCookie('clickDataCookie');
+	   timeSpent = readCookie('timeSpentDataCookie')
+  } 
+  
   $.import_js('experiment/js/experimentPages.js');
 
   pageCounter();
@@ -210,7 +273,7 @@ function experiment() {
   
   $('a').click(function(){
   
-  	var reqestedPage = $(this).attr("href");
+  	 reqestedPage = $(this).attr("href");
 
 /* 			var myvar = "bsc.html"  		
   			if( reqestedPage != myvar ) {
@@ -218,7 +281,7 @@ function experiment() {
 	  			 
 
 	if ($.inArray(reqestedPage, experimentPages) != -1) {
-       	
+       	setCookieData();
 	}else{     		   		 
 		$(this).bind('click',windowUnload());
 		 }	  		
@@ -229,7 +292,7 @@ function experiment() {
 $(document).ready(function(){
 
  experiment();
-  
+
 })
 	 
 
