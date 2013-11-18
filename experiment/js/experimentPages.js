@@ -10,5 +10,5 @@ experimentPages = new Array();
 */
 var experimentPages = [
     "index.html",
-    "ahs.html"
+    "hsc.html"
 ];
