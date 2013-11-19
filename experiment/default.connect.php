@@ -1,4 +1,7 @@
 <?php
+/**
+* Author @james_kirkby
+*/
 
 /********************************
  * Set Variables for database connection

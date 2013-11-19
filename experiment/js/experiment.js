@@ -1,3 +1,7 @@
+/*
+* Author @james_kirkby
+*/
+
 /** cleanExperimentEnviroment()
 * Simply sets all values to 0 cleans all cookies
 * good for dev work and clearing experimentEnviroment after test is complete

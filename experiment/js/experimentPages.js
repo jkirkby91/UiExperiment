@@ -1,3 +1,7 @@
+/*
+* Author @james_kirkby
+*/
+
 var experimentPages = [
     "index.html",
     "ahs.html",
