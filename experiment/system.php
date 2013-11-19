@@ -24,7 +24,7 @@
 * elese the sql query didnt complete send a error response back to the ajax call
 * log the 
 */
-	$saveExperiment = "INSERT INTO `uiExperiment`.`experiment` (`idexperiment`, `time_spent`, `page_clicks`) VALUES (NULL, '".$_GET['time']."', '".$_GET['clicks']."')";
+	$saveExperiment = "INSERT INTO `$database`.`experiment` (`idexperiment`, `time_spent`, `page_clicks`) VALUES (NULL, '".$_GET['time']."', '".$_GET['clicks']."')";
 	
 	mysql_query($saveExperiment);
 	

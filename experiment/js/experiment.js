@@ -1,8 +1,7 @@
 /*
 * Author @james_kirkby
-*/
-
-/** cleanExperimentEnviroment()
+* 
+* cleanExperimentEnviroment()
 * Simply sets all values to 0 cleans all cookies
 * good for dev work and clearing experimentEnviroment after test is complete
 * i want to try and attach this to the sucess ajax call
@@ -97,7 +96,6 @@ function experimentURI() {
 	var host = pathArray[2];
 	var siteUrl = protocol + '//' + host;
 	var pathToDataPhp = "/experiment/system.php"
-
 			 
 	$experimentSystem = siteUrl + pathToDataPhp
 }
@@ -120,9 +118,9 @@ function buildExperimentData() {
 /* setCookieDate()
 * Required when experiment is across multiple plages
 * stores clicks and timeSpent var data in cookie
+* uses buildExperimentData() to get values for cookies
 * when each page runs experiment() experimentEnviroment() initialises the experiment
 * which checks to see if the experimentStatus cookie is set to inProgree
-* which is generated here
 */
 function setCookieData() {
 
@@ -177,7 +175,7 @@ function windowUnload() {
 	                                beforeSend: function(response){alert('Sending');},
 	                                /* success: function(response){ alert('success');}, */
 	                                success: function(){ cleanExperimentEnviroment(); },
-	                                error: function(response){alert('failed');},
+	                                error: function(){ windowUnload(); },
 	                                complete: function(response){alert('finished');},
 	                        })
                         }        
