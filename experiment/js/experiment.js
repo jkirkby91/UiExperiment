@@ -13,7 +13,10 @@ function cleanExperimentEnviroment() {
 	$clicks = 0;
     $timeSpent = 0;
     $experimentSystem = 0;
-
+    $existingClicks = 0;
+    $existingTimeSpent = 0 ;
+    $existingTimeSpent = 0;
+    
     var pathArray = 0;
     var protocol = 0;
     var host = 0;
@@ -49,6 +52,17 @@ function buildExperimentHiddenForm() {
 
 }
 
+/*
+* set timeSpent to hidden form time value
+*/		 
+function updateTimeForm() {
+	$('#time').val($timeSpent);
+}
+
+function updateClickForm() {
+	$("#clicks").val($clicks);
+}
+
 /** 
 * clickCounter();
 * adds an event listner toall a tags
@@ -63,7 +77,7 @@ function clickCounter() {
 	 	window.onbeforeunload = null;
 		
 		$clicks += 1;  		
-		$("#clicks").val($clicks);
+		updateClickForm();
 		
 	});
 }
@@ -84,6 +98,21 @@ function experimentURI() {
 	$experimentSystem = siteUrl + pathToDataPhp
 }
 
+/* buildExperimentDate()
+* helper function to build experiment data 
+* use full for preparing data for cookies and database submission
+*/
+
+function buildExperimentData() {
+	  	
+	  	$existingClicks = parseInt($.cookie("clickCookie"));
+  	   	$existingTimeSpent = $.cookie("timeSpentCookie");		
+		$existingTimeSpent = parseInt($existingTimeSpent);
+				
+		$clicks = $clicks+$existingClicks
+		$timeSpent = $timeSpent+$existingTimeSpent
+}
+
 /* setCookieDate()
 * Required when experiment is across multiple plages
 * stores clicks and timeSpent var data in cookie
@@ -93,17 +122,11 @@ function experimentURI() {
 */
 function setCookieData() {
 
-  	   	var existingClicks = parseInt($.cookie("clickCookie"));
-  	   	var existingTimeSpent = $.cookie("timeSpentCookie");		
-		var existingTimeSpent = parseInt(existingTimeSpent);
-				
-		$clicks = $clicks+existingClicks
-		$timeSpent = $timeSpent+existingTimeSpent
-		
+		buildExperimentData();
+			
 		$.cookie("experimentStatus", "inProgress", { expires: 1 });
 		$.cookie("clickCookie", $clicks, { expires: 1 });
 		$.cookie("timeSpentCookie", $timeSpent, { expires: 1 });
-		alert("debugging");
 }
 
 /*
@@ -125,9 +148,13 @@ function windowUnload() {
 		 	function submitExperimentData() {
 		 				
 			 		 experimentURI();
-			/*
-			* set timeSpent to hidden form time value
-			*/		 $('#time').val($timeSpent);	
+			 		 
+			 		 buildExperimentData();
+			 		 
+			 		 updateTimeForm()
+			 		 
+			 		 updateClickForm();
+	
 			/* 
 			* serialize the form data into a string that can be used for ajax
 			*/	 
@@ -144,7 +171,8 @@ function windowUnload() {
 	                                url: $experimentSystem,
 	                                data: serializedData,
 	                                beforeSend: function(response){alert('Sending');},
-	                                success: function(response){ alert('success');},
+	                                /* success: function(response){ alert('success');}, */
+	                                success: function(){ cleanExperimentEnviroment(); },
 	                                error: function(response){alert('failed');},
 	                                complete: function(response){alert('finished');},
 	                        })
@@ -263,9 +291,7 @@ function experiment() {
 	}else{    
 		$(this).bind('click',windowUnload());		
 	}	  		
-  });
-  
- 
+  }); 
 }
 
 
