@@ -266,6 +266,8 @@ function experimentEnviroment() {
   clickCounter();
   
   buildExperimentHiddenForm();
+  
+  $(this).bind('click',windowUnload());		//dont forget to re-attach the binded window unload function
  
   //enviroment built
   
