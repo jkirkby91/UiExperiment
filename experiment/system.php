@@ -27,7 +27,7 @@
 	$insert_id = mysql_insert_id();
 	
 	if(success){
-		$myFile = "logs/experimentSuccessLog.txt";
+		$myFile = "experimentSuccessLog.txt";
 		$fh = fopen($myFile, 'a') or die("can't open file");
 		
 		$stringData = "experimentID '$insert_id' \n ";
@@ -39,7 +39,7 @@
 	else if(fail){
 		header('HTTP', true, 500);
 		
-		$myFile = "logs/experimentErrorLog.txt";
+		$myFile = "experimentErrorLog.txt";
 		$fh = fopen($myFile, 'a') or die("can't open file");
 		
 		$stringData = "experimentID: '$insert_id' - timeSpent: '".$_GET['time']."' - clicks: '".$_GET['clicks']."' \n ";
