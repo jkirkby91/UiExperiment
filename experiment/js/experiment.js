@@ -1,41 +1,39 @@
-/*
-* ThanksTo //quirksmode.org/js/cookies.html
-* for these simple cookie functions
+/** cleanExperimentEnviroment()
+* Simply sets all values to 0 cleans all cookies
+* good for dev work and clearing experimentEnviroment after test is complete
+* i want to try and attach this to the sucess ajax call
+* would be perfect but haven't got it right yet
 */
-
-function createCookie(name,value,days) {
-	if (days) {
-		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		var expires = "; expires="+date.toGMTString();
-	}
-	else var expires = "";
-	document.cookie = name+"="+value+expires+"; path=/";
+function cleanExperimentEnviroment() {
+	
+	$.cookie("clickCookie", 0);
+	$.cookie("timeSpentCookie", 0);
+	$.cookie("experimentStatus", "");
+	
+	$clicks = 0;
+    $timeSpent = 0;
+    $experimentSystem = 0;
+    $existingClicks = 0;
+    $existingTimeSpent = 0 ;
+    $existingTimeSpent = 0;
+    
+    var pathArray = 0;
+    var protocol = 0;
+    var host = 0;
+    var siteUrl = 0;
+    var pathToDataPhp = 0;
+    var serializedData = 0;
+    var experimentStatus = 0;
+    var reqestedPage = 0;
 }
-
-function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
-
-function eraseCookie(name) {
-	createCookie(name,"",-1);
-}
-
-
 /**
 * pageCounter()
 * Creates the page timer in seconds
 */
 function pageCounter(){
-     timeSpent = 0;
-     setInterval( "timeSpent++", 1000);
+   
+     $timeSpent = 0;    
+     setInterval( "$timeSpent++", 1000);
 }
 
 /**
@@ -43,12 +41,26 @@ function pageCounter(){
 * Builds the hidden form used to submit test data to the database
 * then appends it to the body
 */
+
 function buildExperimentHiddenForm() {
+ 
   $('body').append("<form id='experimentForm'></form>");
   $('#experimentForm').css("display", "none");
   $('#experimentForm').append("<input type='text' name='clicks' id='clicks' value='' /><br>");
   $('#experimentForm').append("<input type='text' name='time' id='time' value='' /><br>");
   $('#experimentForm').append("<input type='button' id='submitButton'>");
+
+}
+
+/*
+* set timeSpent to hidden form time value
+*/		 
+function updateTimeForm() {
+	$('#time').val($timeSpent);
+}
+
+function updateClickForm() {
+	$("#clicks").val($clicks);
 }
 
 /** 
@@ -57,11 +69,16 @@ function buildExperimentHiddenForm() {
 * increments var count every click
 */
 function clickCounter() {
-	clicks = 0;
+
+	$clicks = 0;
 
 	$('a').click(function () {
-		clicks += 1;  
-		$("#clicks").val(clicks);
+	
+	 	window.onbeforeunload = null;
+		
+		$clicks += 1;  		
+		updateClickForm();
+		
 	});
 }
 
@@ -78,7 +95,38 @@ function experimentURI() {
 	var pathToDataPhp = "/experiment/system.php"
 
 			 
-	experimentSystem = siteUrl + pathToDataPhp
+	$experimentSystem = siteUrl + pathToDataPhp
+}
+
+/* buildExperimentDate()
+* helper function to build experiment data 
+* use full for preparing data for cookies and database submission
+*/
+
+function buildExperimentData() {
+	  	
+	  	$existingClicks = parseInt($.cookie("clickCookie"));
+  	   	$existingTimeSpent = $.cookie("timeSpentCookie");		
+		$existingTimeSpent = parseInt($existingTimeSpent);
+				
+		$clicks = $clicks+$existingClicks
+		$timeSpent = $timeSpent+$existingTimeSpent
+}
+
+/* setCookieDate()
+* Required when experiment is across multiple plages
+* stores clicks and timeSpent var data in cookie
+* when each page runs experiment() experimentEnviroment() initialises the experiment
+* which checks to see if the experimentStatus cookie is set to inProgree
+* which is generated here
+*/
+function setCookieData() {
+
+		buildExperimentData();
+			
+		$.cookie("experimentStatus", "inProgress", { expires: 1 });
+		$.cookie("clickCookie", $clicks, { expires: 1 });
+		$.cookie("timeSpentCookie", $timeSpent, { expires: 1 });
 }
 
 /*
@@ -88,10 +136,10 @@ function experimentURI() {
 */ 
 
 function windowUnload() {
-	/* 
+	    
+	    /* 
 		* Create event lister for when dom is being closed
-		*/
-
+		*/	
 		window.onbeforeunload = function() {
 		 /*
 		 * submitExperimentData()
@@ -100,9 +148,13 @@ function windowUnload() {
 		 	function submitExperimentData() {
 		 				
 			 		 experimentURI();
-			/*
-			* set timeSpent to hidden form time value
-			*/		 $('#time').val(timeSpent);	
+			 		 
+			 		 buildExperimentData();
+			 		 
+			 		 updateTimeForm()
+			 		 
+			 		 updateClickForm();
+	
 			/* 
 			* serialize the form data into a string that can be used for ajax
 			*/	 
@@ -113,16 +165,17 @@ function windowUnload() {
 			* the data sent across comes from the serializedData var declared erlier
 			* Some status codes so we know whats going on
 			*/	 			 
-$.ajax({
-                                                type: "GET",
-                                                async: false,
-                                                url: experimentSystem,
-                                                data: serializedData,
-                                                beforeSend: function(response){alert('Sending');},
-                                                success: function(response){ alert('success');},
-                                                error: function(response){alert('failed');},
-                                                complete: function(response){alert('finished');},
-                                        })
+						$.ajax({
+	                                type: "GET",
+	                                async: false,
+	                                url: $experimentSystem,
+	                                data: serializedData,
+	                                beforeSend: function(response){alert('Sending');},
+	                                /* success: function(response){ alert('success');}, */
+	                                success: function(){ cleanExperimentEnviroment(); },
+	                                error: function(response){alert('failed');},
+	                                complete: function(response){alert('finished');},
+	                        })
                         }        
 			
 			/* 
@@ -179,18 +232,38 @@ $.ajax({
 })(jQuery);
 
 /* experimentEnviroment() 
-* bring all the functions for the experiment into one function
+* initalise the experiment enviroment
+* Check to see if there is an experiment in progress
+* if not clean the enviroment preparing it for a new test
+* if experiment is in progress set the $clicks and $timSpent so experiment can continue
 * bring the excluded experiment pages with the custom import_js(); function thanks @Kipras
+* bring the experiment experiment elements into the enviroment
 */
 function experimentEnviroment() {
 
   $.import_js('experiment/js/experimentPages.js');
+  $.import_js('experiment/js/jquery.cookie.js');
+  		
+  var experimentStatus = $.cookie("experimentStatus")
+  
+  if (experimentStatus == null ){
+  		
+  		cleanExperimentEnviroment();
+  		
+  }
+  else {
+  
+	   $clicks = $.cookie("clickCookie");
+	   $timeSpent = $.cookie("timeSpentDataCookie");
+  } 
 
   pageCounter();
  
   clickCounter();
   
   buildExperimentHiddenForm();
+ 
+  //enviroment built
   
 }
 
@@ -210,26 +283,21 @@ function experiment() {
   
   $('a').click(function(){
   
-  	var reqestedPage = $(this).attr("href");
-
-/* 			var myvar = "bsc.html"  		
-  			if( reqestedPage != myvar ) {
-	  			$(this).bind('click',windowUnload());}    */
+  	reqestedPage = $(this).attr("href");
 	  			 
-
 	if ($.inArray(reqestedPage, experimentPages) != -1) {
-       	
-	}else{     		   		 
-		$(this).bind('click',windowUnload());
-		 }	  		
-  });
+ 
+       	setCookieData();
+	}else{    
+		$(this).bind('click',windowUnload());		
+	}	  		
+  }); 
 }
 
 
 $(document).ready(function(){
 
  experiment();
-  
 })
 	 
 

@@ -37,3 +37,4 @@ ehthumbs.db
 Thumbs.db
 
 experiment/connect.php
+experiment/logs/*
