@@ -30,7 +30,7 @@
 	
 	$insert_id = mysql_insert_id();
 	
-	if(success){
+	if(success){	
 		$myFile = "logs/experimentSuccessLog.txt";
 		$fh = fopen($myFile, 'a') or die("can't open file");
 		
