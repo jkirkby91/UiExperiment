@@ -70,3 +70,13 @@ in the distribution so far it mesures clicks and time spent on a set of allowed 
 
 Future..
 As soon as i submit this read me update im going to tryy get this working really modular, drupalesc you might say, with help of require.js
+
+say hello
+@james_kirkby
+me@jameskirkby.com
+
+Visit me
+www.jameskirkby.com
+
+say thanks
+Bitcoin:18h34EUFt4A9xEeNW3euAexLrmZ5RQ5pL5
